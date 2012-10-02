@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Yanhao's Blog</title>
+  <title>SSH agent forwarding and Github - Yanhao's Blog</title>
   <meta name="author" content="Yanhao Yang">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://yanhaoyang.github.com">
+  <link rel="canonical" href="http://yanhaoyang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github">
   <link href="/favicon.ico" rel="icon">
 
   <link href="/assets/bootstrap/css/spacelab.min.css" rel="stylesheet" type="text/css">
@@ -76,15 +76,12 @@
     </header>
     <div id="main">
       <div id="content">
-        <div class="blog-index">
-  
-  
-  
-    <article>
-      
+        <div class="row">
+  <div class="span8">
+    
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/04/20/ssh-agent-forwarding-and-github/">SSH Agent Forwarding and Github</a></h1>
+      <h1 class="entry-title">SSH Agent Forwarding and Github</h1>
     
     
       <p class="meta">
@@ -107,6 +104,8 @@
   </header>
 
 
+  
+  
   <div class="entry-content"><p><a href="http://help.github.com/deploy-keys/">Github&#8217;s help</a> says,</p>
 
 <blockquote><p>&#8220;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy keys. Instead, you should use ssh-agent forwarding to temporarily allow the server to use your local ssh keys. Not only is this method easier to maintain, since you don’t have any extra keys, but it’s also more secure as the server never has keys saved to disk in case of a compromise.&#8221;</p></blockquote>
@@ -138,22 +137,18 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
 
 <p>After that, I can use git commands smoothly :)</p>
 </div>
-  
+
   
 
 
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/">Two Ways to Embed JSON Data in Views of Rails</a></h1>
-    
-    
+    <footer>
       <p class="meta">
         
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Yanhao Yang</span></span>
+
+        
 
 
 
@@ -165,86 +160,38 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
   
 
 
-<time datetime="2011-12-16T21:03:00+08:00" pubdate data-updated="true">Dec 16<span>th</span>, 2011</time>
+<time datetime="2012-04-20T08:02:00+08:00" pubdate data-updated="true">Apr 20<span>th</span>, 2012</time>
+        
+
+
+      </p>
+      
+        <div class="sharing">
+  <br/>
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://yanhaoyang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github/" data-via="" data-counturl="http://yanhaoyang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github/" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+      <p class="meta">
+        
+          <a class="basic-alignment left" href="/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/" title="Previous Post: Two ways to embed JSON data in views of Rails">&laquo; Two ways to embed JSON data in views of Rails</a>
+        
         
       </p>
+    </footer>
     
-  </header>
-
-
-  <div class="entry-content"><p>Several days ago, I wrote a piece of code to embed some JSON data in a web page, which will be used by Javascipt later. It is not likely to change during a session, so it is more convenient to embed it in the web page than requsting the data by Ajax.</p>
-
-<p>The code in the web page is like:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">listData</span> <span class="o">=</span> <span class="s1">&#39;&lt;%= ActiveSupport::JSON.encode(@data) %&gt;&#39;</span><span class="p">.</span><span class="nx">evalJSON</span><span class="p">();</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I am using Prototype framework, FYI.</p>
-
-<p>This implementation worked for a while, before the error rose. It turned out that quotation marks in the data could break the Javascript. For example, if the @data is like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="vi">@data</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;some &quot;name&quot;&#39;</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After some research, I found two ways to solve the problem.</p>
-
-<p>First, dump the JSON string with String#dump. The ruby code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">listData</span> <span class="o">=</span> <span class="o">&lt;%=</span> <span class="nx">ActiveSupport</span><span class="o">::</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="err">@</span><span class="nx">data</span><span class="p">).</span><span class="nx">dump</span> <span class="o">%&gt;</span><span class="p">.</span><span class="nx">evalJSON</span><span class="p">();</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Please note, the quotation marks around &lt;%= &#8230; %> have been removed.</p>
-
-<p>Second, let the SCRIPT tag only hold the JSON data, then retrieve the data in Javascript with innerHTML:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;script </span><span class="na">id=</span><span class="s">&quot;json_data&quot;</span> <span class="na">type=</span><span class="s">&quot;application/json&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="o">&lt;%=</span> <span class="nx">ActiveSupport</span><span class="o">::</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="err">@</span><span class="nx">data</span><span class="p">)</span> <span class="o">%&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">listData</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;json_data&#39;</span><span class="p">).</span><span class="nx">innerHTML</span><span class="p">.</span><span class="nx">evalJSON</span><span class="p">();</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Those are some small fixes, but they solved big troubles.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
     
   </div>
-</div>
-<aside class="sidebar">
+
   
-    <section>
+  <div class="span4 sidebar">
+    <div class="well">
+      
+        <section>
   <h2>Recent Posts</h2>
   <ul id="recent_posts">
     
@@ -264,8 +211,12 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
 
 
 
-  
-</aside>
+      
+    </div>
+  </div>
+
+</div>
+
 
       </div>
     </div>

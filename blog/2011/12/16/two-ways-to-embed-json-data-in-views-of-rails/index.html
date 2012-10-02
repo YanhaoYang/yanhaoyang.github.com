@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Yanhao's Blog</title>
+  <title>Two ways to embed JSON data in views of Rails - Yanhao's Blog</title>
   <meta name="author" content="Yanhao Yang">
 
   
-  <meta name="description" content="Github&#8217;s help says, &#8220;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy &hellip;">
+  <meta name="description" content="Several days ago, I wrote a piece of code to embed some JSON data in a web page, which will be used by Javascipt later. It is not likely to change &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://yanhaoyang.github.com">
+  <link rel="canonical" href="http://yanhaoyang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails">
   <link href="/favicon.ico" rel="icon">
 
   <link href="/assets/bootstrap/css/spacelab.min.css" rel="stylesheet" type="text/css">
@@ -76,80 +76,12 @@
     </header>
     <div id="main">
       <div id="content">
-        <div class="blog-index">
-  
-  
-  
-    <article>
-      
+        <div class="row">
+  <div class="span8">
+    
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/04/20/ssh-agent-forwarding-and-github/">SSH Agent Forwarding and Github</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-20T08:02:00+08:00" pubdate data-updated="true">Apr 20<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://help.github.com/deploy-keys/">Github&#8217;s help</a> says,</p>
-
-<blockquote><p>&#8220;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy keys. Instead, you should use ssh-agent forwarding to temporarily allow the server to use your local ssh keys. Not only is this method easier to maintain, since you don’t have any extra keys, but it’s also more secure as the server never has keys saved to disk in case of a compromise.&#8221;</p></blockquote>
-
-<p>But how to use ssh-agent fowarding?</p>
-
-<p>It&#8217;s pretty simple actually, but I made it work after some research.</p>
-
-<p>First, ssh-agent forwarding can be enabled by,</p>
-
-<ul>
-<li><p>modifying the config file</p>
-
-<p>  Host *</p>
-
-<pre><code>ForwardAgent yes
-</code></pre></li>
-<li><p>using -A option in the command line.</p></li>
-</ul>
-
-
-<p>After enabling ssh-agent forwarding, I can connect another server from a connected server without sending a password. The private key on my MacBook is used for authentication.</p>
-
-<p>But when I tried to run &#8220;sudo git pull&#8221;, the command failed. In order to use ssh-agent forwarding after running sudo, I need to keep the environment variable <code>SSH_AUTH_SOCK</code>. This could be done by editing /etc/sudoers file,</p>
-
-<pre><code>Defaults    env_reset
-Defaults    env_keep = "SSH_AUTH_SOCK"
-</code></pre>
-
-<p>After that, I can use git commands smoothly :)</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/">Two Ways to Embed JSON Data in Views of Rails</a></h1>
+      <h1 class="entry-title">Two Ways to Embed JSON Data in Views of Rails</h1>
     
     
       <p class="meta">
@@ -172,6 +104,8 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
   </header>
 
 
+  
+  
   <div class="entry-content"><p>Several days ago, I wrote a piece of code to embed some JSON data in a web page, which will be used by Javascipt later. It is not likely to change during a session, so it is more convenient to embed it in the web page than requsting the data by Ajax.</p>
 
 <p>The code in the web page is like:</p>
@@ -230,21 +164,61 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
 
 <p>Those are some small fixes, but they solved big troubles.</p>
 </div>
-  
+
   
 
 
-    </article>
+    <footer>
+      <p class="meta">
+        
   
-  <div class="pagination">
+
+<span class="byline author vcard">Posted by <span class="fn">Yanhao Yang</span></span>
+
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-16T21:03:00+08:00" pubdate data-updated="true">Dec 16<span>th</span>, 2011</time>
+        
+
+
+      </p>
+      
+        <div class="sharing">
+  <br/>
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://yanhaoyang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/" data-via="" data-counturl="http://yanhaoyang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+      <p class="meta">
+        
+        
+          <a class="basic-alignment right" href="/blog/2012/04/20/ssh-agent-forwarding-and-github/" title="Next Post: SSH agent forwarding and Github">SSH agent forwarding and Github &raquo;</a>
+        
+      </p>
+    </footer>
     
-    <a href="/blog/archives">Blog Archives</a>
     
   </div>
-</div>
-<aside class="sidebar">
+
   
-    <section>
+  <div class="span4 sidebar">
+    <div class="well">
+      
+        <section>
   <h2>Recent Posts</h2>
   <ul id="recent_posts">
     
@@ -264,8 +238,12 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
 
 
 
-  
-</aside>
+      
+    </div>
+  </div>
+
+</div>
+
 
       </div>
     </div>
