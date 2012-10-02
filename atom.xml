@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Yanhao's Blog]]></title>
-  <link href="http://yanhaoyang.github.com/atom.xml" rel="self"/>
-  <link href="http://yanhaoyang.github.com/"/>
-  <updated>2012-10-02T15:01:00+08:00</updated>
-  <id>http://yanhaoyang.github.com/</id>
+  <link href="http://YanhaoYang.github.com/atom.xml" rel="self"/>
+  <link href="http://YanhaoYang.github.com/"/>
+  <updated>2012-10-02T16:44:06+08:00</updated>
+  <id>http://YanhaoYang.github.com/</id>
   <author>
     <name><![CDATA[Yanhao Yang]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[SSH agent forwarding and Github]]></title>
-    <link href="http://yanhaoyang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github/"/>
+    <link href="http://YanhaoYang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github/"/>
     <updated>2012-04-20T08:02:00+08:00</updated>
-    <id>http://yanhaoyang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github</id>
+    <id>http://YanhaoYang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github</id>
     <content type="html"><![CDATA[<p><a href="http://help.github.com/deploy-keys/">Github&#8217;s help</a> says,</p>
 
 <blockquote><p>&#8220;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy keys. Instead, you should use ssh-agent forwarding to temporarily allow the server to use your local ssh keys. Not only is this method easier to maintain, since you don’t have any extra keys, but it’s also more secure as the server never has keys saved to disk in case of a compromise.&#8221;</p></blockquote>
@@ -53,9 +53,9 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
   
   <entry>
     <title type="html"><![CDATA[Two ways to embed JSON data in views of Rails]]></title>
-    <link href="http://yanhaoyang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/"/>
+    <link href="http://YanhaoYang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/"/>
     <updated>2011-12-16T21:03:00+08:00</updated>
-    <id>http://yanhaoyang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails</id>
+    <id>http://YanhaoYang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails</id>
     <content type="html"><![CDATA[<p>Several days ago, I wrote a piece of code to embed some JSON data in a web page, which will be used by Javascipt later. It is not likely to change during a session, so it is more convenient to embed it in the web page than requsting the data by Ajax.</p>
 
 <p>The code in the web page is like:</p>
