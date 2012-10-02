@@ -244,9 +244,9 @@ desc "deploy public directory to github pages"
 multitask :push do
   puts "## Deploying branch to Github Pages "
   (Dir["#{deploy_dir}/*"]).each { |f| rm_rf(f) }
-  Rake::Task[:copydot].invoke(public_dir, deploy_dir)
   puts "\n## copying #{public_dir} to #{deploy_dir}"
   cp_r "#{public_dir}/.", deploy_dir
+  Rake::Task[:copydot].invoke(public_dir, deploy_dir)
   cd "#{deploy_dir}" do
     system "git add ."
     system "git add -u"
@@ -299,7 +299,13 @@ task :setup_github_pages, :repo do |t, args|
   if args.repo
     repo_url = args.repo
   else
+<<<<<<< Updated upstream
     repo_url = get_stdin("Enter the read/write url for your repository: ")
+=======
+    puts "Enter the read/write url for your repository"
+    puts "(For example, 'git@github.com:your_username/your_username.github.com)"
+    repo_url = get_stdin("Repository url: ")
+>>>>>>> Stashed changes
   end
   user = repo_url.match(/:([^\/]+)/)[1]
   branch = (repo_url.match(/\/[\w-]+.github.com/).nil?) ? 'gh-pages' : 'master'
