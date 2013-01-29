@@ -4,7 +4,7 @@
   <title><![CDATA[Yanhao's Blog]]></title>
   <link href="http://YanhaoYang.github.com/atom.xml" rel="self"/>
   <link href="http://YanhaoYang.github.com/"/>
-  <updated>2012-10-02T17:15:13+08:00</updated>
+  <updated>2013-01-29T21:21:15+08:00</updated>
   <id>http://YanhaoYang.github.com/</id>
   <author>
     <name><![CDATA[Yanhao Yang]]></name>
@@ -12,6 +12,94 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A pitfall of updating foreign key with `update_attribute`]]></title>
+    <link href="http://YanhaoYang.github.com/blog/2013/01/29/a-pitfall-of-updating-foreign-key-with-update-attribute/"/>
+    <updated>2013-01-29T17:23:00+08:00</updated>
+    <id>http://YanhaoYang.github.com/blog/2013/01/29/a-pitfall-of-updating-foreign-key-with-update-attribute</id>
+    <content type="html"><![CDATA[<p>Suppose there are following models and associations:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">class</span> <span class="nc">Foo</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>    <span class="n">belongs_to</span> <span class="ss">:bar</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Bar</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>    <span class="n">has_one</span> <span class="ss">:foo</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Instead of changing the associated object <code>:bar</code>, you can assign a Bar object to it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>you may want to update the foreign key directly with <code>update_attribute</code> sometimes:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>However, this doesn&#8217;t always work.</p>
+
+<p>For example, in following code <code>update_attribute</code> does nothing:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&#8217;s wrong with it?</p>
+
+<p>This is a result of the autosave mechanism of ActiveRecord. When <code>Foo#bar=</code> is called, a callback for saving associations will be created, which will set <code>foo.bar_id</code> to <code>bar.id</code>.</p>
+
+<p>In above code, the actual process is:</p>
+
+<ul>
+<li>foo.bar_id is set to 2</li>
+<li>the callback for autosave is called, which set foo.bar_id to 1</li>
+<li>foo.save saves nothing because the attribute is not changed.</li>
+</ul>
+
+
+<p>I am not sure the problem is a bug or not.</p>
+
+<p>There are two ways to update the value correctly. First, reload the object before calling <code>update_attribute</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">reload</span>
+</span><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Second, use a bar object as parameter for <code>update_attribute</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These are two workarounds I think of.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[SSH agent forwarding and Github]]></title>

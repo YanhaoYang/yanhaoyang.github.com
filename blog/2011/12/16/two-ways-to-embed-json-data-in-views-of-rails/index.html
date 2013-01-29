@@ -63,10 +63,6 @@
             </fieldset>
           </form>
         
-        <ul class="nav pull-right">
-          <li>
-          </li>
-        </ul>
       </div><!-- /.nav-collapse -->
     </div>
   </div><!-- /navbar-inner -->
@@ -195,8 +191,6 @@
         <div class="sharing">
   <br/>
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://YanhaoYang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/" data-via="" data-counturl="http://YanhaoYang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/" >Tweet</a>
-  
   
   
 </div>
@@ -211,6 +205,12 @@
     </footer>
     
     
+      <section>
+        <h1>Comments</h1>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
   </div>
 
   
@@ -220,6 +220,10 @@
         <section>
   <h2>Recent Posts</h2>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/01/29/a-pitfall-of-updating-foreign-key-with-update-attribute/">A pitfall of updating foreign key with `update_attribute`</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/04/20/ssh-agent-forwarding-and-github/">SSH agent forwarding and Github</a>
@@ -247,7 +251,7 @@
       </div>
     </div>
     <footer class="footer"><p>
-  Copyright &copy; 2012 - Yanhao Yang -
+  Copyright &copy; 2013 - Yanhao Yang -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> -
   
     <span class="credit">Theme by <a href="http://brianarmstrong.org">Brian Armstrong</a></span>
@@ -255,6 +259,22 @@
 </p>
 </footer>
     
+
+<script type="text/javascript">
+      var disqus_shortname = 'yanhao';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://YanhaoYang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/';
+        var disqus_url = 'http://YanhaoYang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 
@@ -264,6 +284,7 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+
 
   </div>
 </body>
