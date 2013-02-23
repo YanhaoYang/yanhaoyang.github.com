@@ -4,7 +4,7 @@
   <title><![CDATA[Yanhao's Blog]]></title>
   <link href="http://YanhaoYang.github.com/atom.xml" rel="self"/>
   <link href="http://YanhaoYang.github.com/"/>
-  <updated>2013-01-29T21:21:15+08:00</updated>
+  <updated>2013-02-23T23:34:25+08:00</updated>
   <id>http://YanhaoYang.github.com/</id>
   <author>
     <name><![CDATA[Yanhao Yang]]></name>
@@ -98,6 +98,8 @@
 
 
 <p>These are two workarounds I think of.</p>
+
+<p><strong>UPDATE</strong>: <code>update_attribute</code> is being deprecated in favor of <code>update_column</code>, and will be removed in Rails 4.</p>
 ]]></content>
   </entry>
   
