@@ -10,9 +10,9 @@ layout: default
         {% if page.date %}<p class="meta">{% include post/date.html %}{{ time }}</p>{% endif %}
       </div>
     {% endif %}
-    
+
     {{ content }}
-    
+
     {% unless page.footer == false %}
       <footer>
         {% if page.date or page.author %}<p class="meta">
@@ -25,7 +25,7 @@ layout: default
         {% endunless %}
       </footer>
     {% endunless %}
-    
+
     {% if site.disqus_short_name and page.comments == true %}
       <section>
         <h1>Comments</h1>
