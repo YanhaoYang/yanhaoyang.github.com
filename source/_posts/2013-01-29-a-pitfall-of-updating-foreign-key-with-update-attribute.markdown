@@ -24,7 +24,7 @@ Instead of changing the associated object `:bar`, you can assign a Bar object to
   foo.bar = Bar.find(1)
 ```
 
-you may want to update the foreign key directly with `update_attribute` sometimes:
+You may want to update the foreign key directly with `update_attribute` sometimes:
 
 ``` ruby
   foo.update_attribute :bar_id, 1
@@ -66,4 +66,5 @@ Second, use a bar object as parameter for `update_attribute`:
   foo.update_attribute :bar_id, Bar.find(2)
 ```
 
-These are two workarounds I think of.
+
+hese are two workarounds I think of.
