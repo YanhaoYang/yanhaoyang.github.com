@@ -4,7 +4,7 @@
   <title><![CDATA[Yanhao's Blog]]></title>
   <link href="http://YanhaoYang.github.com/atom.xml" rel="self"/>
   <link href="http://YanhaoYang.github.com/"/>
-  <updated>2013-11-21T11:08:24+08:00</updated>
+  <updated>2013-11-21T11:35:24+08:00</updated>
   <id>http://YanhaoYang.github.com/</id>
   <author>
     <name><![CDATA[Yanhao Yang]]></name>
@@ -45,7 +45,7 @@ of the Ruby code is running.</p>
 <h2>crash-watch</h2>
 
 <p><code>crash-watch</code> is a <a href="https://github.com/FooBarWidget/crash-watch">gem</a> which
-&#8220;monitor processes and display useful information when they crash&#8221;.</p>
+&ldquo;monitor processes and display useful information when they crash&rdquo;.</p>
 
 <p>This is much more useful than strace in this case. It prints out the whole
 c call stacks. Now I see that the process stopped after a call to <code>pthread_mutex_lock</code>,
@@ -122,7 +122,7 @@ variables, c backtraces, ruby backtraces, and open files.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This works well during development. But when you want to deloy it to server and run <code>bundle install --deployment ...</code>, bundler complaints that there&#8217;s no Gemfile.lock. What if you just run <code>bundle install</code> locally, create the Gemfile.lock and check it in? You have to regenerate the lock file each time you switch between development and deployment.</p>
+<p>This works well during development. But when you want to deloy it to server and run <code>bundle install --deployment ...</code>, bundler complaints that there&rsquo;s no Gemfile.lock. What if you just run <code>bundle install</code> locally, create the Gemfile.lock and check it in? You have to regenerate the lock file each time you switch between development and deployment.</p>
 
 <p>Another solution is to create two Gemfiles, one for development, another for deployment.</p>
 
@@ -156,7 +156,7 @@ variables, c backtraces, ruby backtraces, and open files.</p>
 
 <p>You just tell bundler which Gemfile to use by setting environment variable <code>BUNDLE_GEMFILE</code>, <code>bundle</code> and <code>rails</code> commands will work as usual.</p>
 
-<p>However, when you change something in the Gemfiles, you have to update both files. That&#8217;s not DRY.</p>
+<p>However, when you change something in the Gemfiles, you have to update both files. That&rsquo;s not DRY.</p>
 
 <h2>Make them DRY</h2>
 
@@ -272,7 +272,7 @@ variables, c backtraces, ruby backtraces, and open files.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>However, this doesn&#8217;t always work.</p>
+<p>However, this doesn&rsquo;t always work.</p>
 
 <p>For example, in following code <code>update_attribute</code> does nothing:</p>
 
@@ -283,7 +283,7 @@ variables, c backtraces, ruby backtraces, and open files.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&#8217;s wrong with it?</p>
+<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&rsquo;s wrong with it?</p>
 
 <p>This is a result of the autosave mechanism of ActiveRecord. When <code>Foo#bar=</code> is called, a callback for saving associations will be created, which will set <code>foo.bar_id</code> to <code>bar.id</code>.</p>
 
@@ -327,13 +327,13 @@ variables, c backtraces, ruby backtraces, and open files.</p>
     <link href="http://YanhaoYang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github/"/>
     <updated>2012-04-20T08:02:00+08:00</updated>
     <id>http://YanhaoYang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github</id>
-    <content type="html"><![CDATA[<p><a href="http://help.github.com/deploy-keys/">Github&#8217;s help</a> says,</p>
+    <content type="html"><![CDATA[<p><a href="http://help.github.com/deploy-keys/">Github&rsquo;s help</a> says,</p>
 
-<blockquote><p>&#8220;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy keys. Instead, you should use ssh-agent forwarding to temporarily allow the server to use your local ssh keys. Not only is this method easier to maintain, since you don’t have any extra keys, but it’s also more secure as the server never has keys saved to disk in case of a compromise.&#8221;</p></blockquote>
+<blockquote><p>&ldquo;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy keys. Instead, you should use ssh-agent forwarding to temporarily allow the server to use your local ssh keys. Not only is this method easier to maintain, since you don’t have any extra keys, but it’s also more secure as the server never has keys saved to disk in case of a compromise.&rdquo;</p></blockquote>
 
 <p>But how to use ssh-agent fowarding?</p>
 
-<p>It&#8217;s pretty simple actually, but I made it work after some research.</p>
+<p>It&rsquo;s pretty simple actually, but I made it work after some research.</p>
 
 <p>First, ssh-agent forwarding can be enabled by,</p>
 
@@ -348,7 +348,7 @@ variables, c backtraces, ruby backtraces, and open files.</p>
 
 <p>After enabling ssh-agent forwarding, I can connect another server from a connected server without sending a password. The private key on my MacBook is used for authentication.</p>
 
-<p>But when I tried to run &#8220;sudo git pull&#8221;, the command failed. In order to use ssh-agent forwarding after running sudo, I need to keep the environment variable <code>SSH_AUTH_SOCK</code>. This could be done by editing /etc/sudoers file,</p>
+<p>But when I tried to run &ldquo;sudo git pull&rdquo;, the command failed. In order to use ssh-agent forwarding after running sudo, I need to keep the environment variable <code>SSH_AUTH_SOCK</code>. This could be done by editing /etc/sudoers file,</p>
 
 <pre><code>Defaults    env_reset
 Defaults    env_keep = "SSH_AUTH_SOCK"
@@ -398,7 +398,7 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Please note, the quotation marks around &lt;%= &#8230; %> have been removed.</p>
+<p>Please note, the quotation marks around &lt;%= &hellip; %> have been removed.</p>
 
 <p>Second, let the SCRIPT tag only hold the JSON data, then retrieve the data in Javascript with innerHTML:</p>
 

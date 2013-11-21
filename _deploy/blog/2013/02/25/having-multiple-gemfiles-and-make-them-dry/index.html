@@ -122,7 +122,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This works well during development. But when you want to deloy it to server and run <code>bundle install --deployment ...</code>, bundler complaints that there&#8217;s no Gemfile.lock. What if you just run <code>bundle install</code> locally, create the Gemfile.lock and check it in? You have to regenerate the lock file each time you switch between development and deployment.</p>
+<p>This works well during development. But when you want to deloy it to server and run <code>bundle install --deployment ...</code>, bundler complaints that there&rsquo;s no Gemfile.lock. What if you just run <code>bundle install</code> locally, create the Gemfile.lock and check it in? You have to regenerate the lock file each time you switch between development and deployment.</p>
 
 <p>Another solution is to create two Gemfiles, one for development, another for deployment.</p>
 
@@ -156,7 +156,7 @@
 
 <p>You just tell bundler which Gemfile to use by setting environment variable <code>BUNDLE_GEMFILE</code>, <code>bundle</code> and <code>rails</code> commands will work as usual.</p>
 
-<p>However, when you change something in the Gemfiles, you have to update both files. That&#8217;s not DRY.</p>
+<p>However, when you change something in the Gemfiles, you have to update both files. That&rsquo;s not DRY.</p>
 
 <h2>Make them DRY</h2>
 
@@ -318,7 +318,6 @@
     
   </ul>
 </section>
-
 
 
 

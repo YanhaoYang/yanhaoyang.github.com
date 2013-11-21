@@ -130,7 +130,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>However, this doesn&#8217;t always work.</p>
+<p>However, this doesn&rsquo;t always work.</p>
 
 <p>For example, in following code <code>update_attribute</code> does nothing:</p>
 
@@ -141,7 +141,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&#8217;s wrong with it?</p>
+<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&rsquo;s wrong with it?</p>
 
 <p>This is a result of the autosave mechanism of ActiveRecord. When <code>Foo#bar=</code> is called, a callback for saving associations will be created, which will set <code>foo.bar_id</code> to <code>bar.id</code>.</p>
 
@@ -264,7 +264,6 @@
     
   </ul>
 </section>
-
 
 
 
