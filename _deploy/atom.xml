@@ -4,7 +4,7 @@
   <title><![CDATA[Yanhao's Blog]]></title>
   <link href="http://YanhaoYang.github.com/atom.xml" rel="self"/>
   <link href="http://YanhaoYang.github.com/"/>
-  <updated>2013-02-25T15:43:28+08:00</updated>
+  <updated>2013-11-21T10:58:25+08:00</updated>
   <id>http://YanhaoYang.github.com/</id>
   <author>
     <name><![CDATA[Yanhao Yang]]></name>
@@ -12,6 +12,85 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Debug a deadlock caused by the ruby JSON parser Oj]]></title>
+    <link href="http://YanhaoYang.github.com/blog/2013/11/21/debug-a-deadlock-caused-by-the-ruby-json-parser-oj/"/>
+    <updated>2013-11-21T08:01:00+08:00</updated>
+    <id>http://YanhaoYang.github.com/blog/2013/11/21/debug-a-deadlock-caused-by-the-ruby-json-parser-oj</id>
+    <content type="html"><![CDATA[<p>Recently some busy processes hang sometimes on a production server,
+where an application based Rails 3.2.13 is running on Ruby 1.9.3-p448.</p>
+
+<p>The problem happened randomly, making it very difficult to debug. Basically,
+the processes sent tens of requests to another server to get some JSON documents,
+then parsed the JSON documents with Oj and initialize many nested objects with
+that data. The processes usually hang after sending a few tens of requests.</p>
+
+<p>After some research, I found some tools to help me locate the problem.</p>
+
+<h2>strace</h2>
+
+<p>Suppose the process 1234 has hang, following command will show where the process
+hang:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>strace -p 1234</span></code></pre></td></tr></table></div></figure>
+
+
+<p>However, it seems not quit useful because the information is very simple.</p>
+
+<p>If I run the command before the process hung, I can roughly see which part
+of the Ruby code is running.</p>
+
+<h2>crash-watch</h2>
+
+<p><code>crash-watch</code> is a <a href="https://github.com/FooBarWidget/crash-watch">gem</a> which
+&#8220;monitor processes and display useful information when they crash&#8221;.</p>
+
+<p>This is much more useful than strace in this case. It prints out the whole
+c call stacks. Now I see that the process stopped after a call to <code>pthread_mutex_lock</code>,
+which is called from <code>mark</code> function in val_stack.c file, line 39.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#0  0x00007fbb8058d89c in __lll_lock_wait () from /lib/x86_64-linux-gnu/libpthread.so.0
+</span><span class='line'>#1  0x00007fbb80589080 in _L_lock_903 () from /lib/x86_64-linux-gnu/libpthread.so.0
+</span><span class='line'>#2  0x00007fbb80588f19 in pthread_mutex_lock () from /lib/x86_64-linux-gnu/libpthread.so.0
+</span><span class='line'>#3  0x00007fbb756b3d66 in mark (ptr=&lt;optimized out&gt;) at val_stack.c:39
+</span><span class='line'>#4  0x000000000041fcf9 in gc_mark_children (ptr=135392480, objspace=0x25da8a0) at gc.c:1969
+</span><span class='line'>#5  gc_mark_stacked_objects (objspace=0x25da8a0) at gc.c:1506
+</span><span class='line'>#6  gc_marks (objspace=0x25da8a0) at gc.c:2578
+</span><span class='line'>#7  0x00000000004207ea in garbage_collect (objspace=0x25da8a0) at gc.c:2602
+</span><span class='line'>#8  0x0000000000420e68 in garbage_collect_with_gvl (objspace=0x25da8a0) at gc.c:731
+</span><span class='line'>#9  vm_malloc_prepare (size=129, objspace=0x25da8a0) at gc.c:761
+</span><span class='line'>#10 vm_xmalloc (objspace=0x25da8a0, size=&lt;optimized out&gt;) at gc.c:795
+</span><span class='line'>#11 0x00000000004c9ec3 in rb_str_buf_new (capa=128) at string.c:745
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When I found the source code in Oj gem, it has been clear that the problem is a
+deadlock cause by the gem.</p>
+
+<h2>nrdebug</h2>
+
+<p>After that, I found a more powerful tool built by New Relic: <code>nrdebug</code> in <code>bin</code> directory of
+the newrelic_rpm gem. It collects everything about the process thoroughly, including environment
+variables, c backtraces, ruby backtraces, and open files.</p>
+
+<p>I should have known it earlier.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Having Multiple Gemfiles and Make them DRY]]></title>
@@ -169,11 +248,11 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">class</span> <span class="nc">Foo</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">class</span> <span class="nc">Foo</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class='line'>    <span class="n">belongs_to</span> <span class="ss">:bar</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Bar</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Bar</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class='line'>    <span class="n">has_one</span> <span class="ss">:foo</span>
 </span><span class='line'>  <span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>

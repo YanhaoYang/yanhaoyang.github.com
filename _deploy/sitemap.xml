@@ -4,34 +4,40 @@
         <loc>
             http://YanhaoYang.github.com/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/
         </loc>
-        <lastmod>2013-02-24T04:46:51+08:00</lastmod>
+        <lastmod>2013-11-21T10:57:22+08:00</lastmod>
     </url>
     <url>
         <loc>http://YanhaoYang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github/</loc>
-        <lastmod>2013-02-24T04:46:51+08:00</lastmod>
+        <lastmod>2013-11-21T10:57:22+08:00</lastmod>
     </url>
     <url>
         <loc>
             http://YanhaoYang.github.com/blog/2013/01/29/a-pitfall-of-updating-foreign-key-with-update-attribute/
         </loc>
-        <lastmod>2013-02-25T15:13:47+08:00</lastmod>
+        <lastmod>2013-11-21T10:57:22+08:00</lastmod>
     </url>
     <url>
         <loc>
             http://YanhaoYang.github.com/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/
         </loc>
-        <lastmod>2013-02-25T15:43:13+08:00</lastmod>
+        <lastmod>2013-11-21T10:57:22+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://YanhaoYang.github.com/blog/2013/11/21/debug-a-deadlock-caused-by-the-ruby-json-parser-oj/
+        </loc>
+        <lastmod>2013-11-21T10:57:22+08:00</lastmod>
     </url>
     <url>
         <loc>http://YanhaoYang.github.com/</loc>
-        <lastmod>2013-02-25T15:43:13+08:00</lastmod>
+        <lastmod>2013-11-21T10:57:22+08:00</lastmod>
     </url>
     <url>
         <loc>http://YanhaoYang.github.com/blog/archives/</loc>
-        <lastmod>2013-02-25T15:43:13+08:00</lastmod>
+        <lastmod>2013-11-21T10:57:22+08:00</lastmod>
     </url>
     <url>
         <loc>http://YanhaoYang.github.com/404.html</loc>
-        <lastmod>2013-02-24T04:46:48+08:00</lastmod>
+        <lastmod>2013-11-21T10:57:22+08:00</lastmod>
     </url>
 </urlset>
