@@ -251,12 +251,8 @@ multitask :push do
     system "git pull"
   end
   (Dir["#{deploy_dir}/*"]).each { |f| rm_rf(f) }
-<<<<<<< HEAD
-  puts "\n## copying #{public_dir} to #{deploy_dir}"
-=======
   Rake::Task[:copydot].invoke(public_dir, deploy_dir)
   puts "\n## Copying #{public_dir} to #{deploy_dir}"
->>>>>>> 64ba60322571d0735a3220cdf8dba657703f64da
   cp_r "#{public_dir}/.", deploy_dir
   Rake::Task[:copydot].invoke(public_dir, deploy_dir)
   cd "#{deploy_dir}" do
@@ -311,10 +307,6 @@ task :setup_github_pages, :repo do |t, args|
     repo_url = args.repo
   else
     puts "Enter the read/write url for your repository"
-<<<<<<< HEAD
-    puts "(For example, 'git@github.com:your_username/your_username.github.com)"
-    repo_url = get_stdin("Repository url: ")
-=======
     puts "(For example, 'git@github.com:your_username/your_username.github.io.git)"
     puts "           or 'https://github.com/your_username/your_username.github.io')"
     repo_url = get_stdin("Repository url: ")
@@ -324,7 +316,6 @@ task :setup_github_pages, :repo do |t, args|
     user = repo_url.match(/:([^\/]+)/)[1]
   else
     user = repo_url.match(/github\.com\/([^\/]+)/)[1]
->>>>>>> 64ba60322571d0735a3220cdf8dba657703f64da
   end
   branch = (repo_url.match(/\/[\w-]+\.github\.(?:io|com)/).nil?) ? 'gh-pages' : 'master'
   project = (branch == 'gh-pages') ? repo_url.match(/\/([^\.]+)/)[1] : ''
