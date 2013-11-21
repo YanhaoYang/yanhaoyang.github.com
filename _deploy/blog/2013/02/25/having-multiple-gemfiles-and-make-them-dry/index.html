@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Yanhao's Blog</title>
+  <title>Having Multiple Gemfiles and Make them DRY - Yanhao's Blog</title>
   <meta name="author" content="Yanhao Yang">
 
   <!-- http://t.co/dKP3o1e -->
@@ -14,7 +14,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://YanhaoYang.github.com">
+  <link rel="canonical" href="http://YanhaoYang.github.com/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry">
   <link href="/favicon.ico" rel="icon">
 
   <link href="/assets/bootstrap/css/spacelab.min.css" rel="stylesheet" type="text/css">
@@ -67,15 +67,12 @@
     </header>
     <div id="main">
       <div id="content">
-        <div class="blog-index">
-  
-  
-  
-    <article>
-      
+        <div class="row">
+  <div class="span8">
+    
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/">Having Multiple Gemfiles and Make Them DRY</a></h1>
+      <h1 class="entry-title">Having Multiple Gemfiles and Make Them DRY</h1>
     
     
       <p class="meta">
@@ -98,6 +95,8 @@
   </header>
 
 
+  
+  
   <div class="entry-content"><h2>Problem and solutions</h2>
 
 <p>Suppose you are developing a great gem for your great application. For convenience, you want to use local path in your Gemfile locally, but you want to let it install the gem from Github on deployment. Due to the limitation of Bundler, you cannot define a same gem from different sources in your Gemfile. One workaround is to switch the definitions in Gemfile by checking an environment varialbe.</p>
@@ -233,291 +232,65 @@
 
 <p>You also need to pass <code>BUNDLE_GEMFILE</code> to rails server so that it can load dependencies correctly.</p>
 </div>
-  
+
   
 
 
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/01/29/a-pitfall-of-updating-foreign-key-with-update-attribute/">A Pitfall of Updating Foreign Key With `update_attribute`</a></h1>
-    
-    
+    <footer>
       <p class="meta">
         
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Yanhao Yang</span></span>
 
-<time datetime="2013-01-29T17:23:00+08:00" pubdate data-updated="true">Jan 29<span>th</span>, 2013</time>
         
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-25T21:13:00+08:00" pubdate data-updated="true">Feb 25<span>th</span>, 2013</time>
+        
+
+
       </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Suppose there are following models and associations:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">class</span> <span class="nc">Foo</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-</span><span class='line'>    <span class="n">belongs_to</span> <span class="ss">:bar</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Bar</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-</span><span class='line'>    <span class="n">has_one</span> <span class="ss">:foo</span>
-</span><span class='line'>  <span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Instead of changing the associated object <code>:bar</code>, you can assign a Bar object to it:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You may want to update the foreign key directly with <code>update_attribute</code> sometimes:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">1</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>However, this doesn&#8217;t always work.</p>
-
-<p>For example, in following code <code>update_attribute</code> does nothing:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">2</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&#8217;s wrong with it?</p>
-
-<p>This is a result of the autosave mechanism of ActiveRecord. When <code>Foo#bar=</code> is called, a callback for saving associations will be created, which will set <code>foo.bar_id</code> to <code>bar.id</code>.</p>
-
-<p>In above code, the actual process is:</p>
-
-<ul>
-<li>foo.bar_id is set to 2</li>
-<li>the callback for autosave is called, which set foo.bar_id to 1</li>
-<li>foo.save saves nothing because the attribute is not changed.</li>
-</ul>
-
-
-<p>I am not sure the problem is a bug or not.</p>
-
-<p>There are two ways to update the value correctly. First, reload the object before calling <code>update_attribute</code>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">reload</span>
-</span><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">2</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Second, use a bar object as parameter for <code>update_attribute</code>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="no">Bar</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>hese are two workarounds I think of.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/20/ssh-agent-forwarding-and-github/">SSH Agent Forwarding and Github</a></h1>
-    
-    
+        <div class="sharing">
+  <br/>
+  
+  
+  
+</div>
+
+      
       <p class="meta">
         
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-20T08:02:00+08:00" pubdate data-updated="true">Apr 20<span>th</span>, 2012</time>
+          <a class="basic-alignment left" href="/blog/2013/01/29/a-pitfall-of-updating-foreign-key-with-update-attribute/" title="Previous Post: A pitfall of updating foreign key with `update_attribute`">&laquo; A pitfall of updating foreign key with `update_attribute`</a>
+        
         
       </p>
+    </footer>
+
     
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://help.github.com/deploy-keys/">Github&#8217;s help</a> says,</p>
-
-<blockquote><p>&#8220;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy keys. Instead, you should use ssh-agent forwarding to temporarily allow the server to use your local ssh keys. Not only is this method easier to maintain, since you don’t have any extra keys, but it’s also more secure as the server never has keys saved to disk in case of a compromise.&#8221;</p></blockquote>
-
-<p>But how to use ssh-agent fowarding?</p>
-
-<p>It&#8217;s pretty simple actually, but I made it work after some research.</p>
-
-<p>First, ssh-agent forwarding can be enabled by,</p>
-
-<ul>
-<li><p>modifying the config file</p>
-
-<p>  Host *
-    ForwardAgent yes</p></li>
-<li><p>using -A option in the command line.</p></li>
-</ul>
-
-
-<p>After enabling ssh-agent forwarding, I can connect another server from a connected server without sending a password. The private key on my MacBook is used for authentication.</p>
-
-<p>But when I tried to run &#8220;sudo git pull&#8221;, the command failed. In order to use ssh-agent forwarding after running sudo, I need to keep the environment variable <code>SSH_AUTH_SOCK</code>. This could be done by editing /etc/sudoers file,</p>
-
-<pre><code>Defaults    env_reset
-Defaults    env_keep = "SSH_AUTH_SOCK"
-</code></pre>
-
-<p>After that, I can use git commands smoothly :)</p>
+      <section>
+        <h1>Comments</h1>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/12/16/two-ways-to-embed-json-data-in-views-of-rails/">Two Ways to Embed JSON Data in Views of Rails</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-12-16T21:03:00+08:00" pubdate data-updated="true">Dec 16<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Several days ago, I wrote a piece of code to embed some JSON data in a web page, which will be used by Javascipt later. It is not likely to change during a session, so it is more convenient to embed it in the web page than requsting the data by Ajax.</p>
-
-<p>The code in the web page is like:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">listData</span> <span class="o">=</span> <span class="s1">&#39;&lt;%= ActiveSupport::JSON.encode(@data) %&gt;&#39;</span><span class="p">.</span><span class="nx">evalJSON</span><span class="p">();</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I am using Prototype framework, FYI.</p>
-
-<p>This implementation worked for a while, before the error rose. It turned out that quotation marks in the data could break the Javascript. For example, if the @data is like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="vi">@data</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;some &quot;name&quot;&#39;</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After some research, I found two ways to solve the problem.</p>
-
-<p>First, dump the JSON string with String#dump. The ruby code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">listData</span> <span class="o">=</span> <span class="o">&lt;%=</span> <span class="nx">ActiveSupport</span><span class="o">::</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="err">@</span><span class="nx">data</span><span class="p">).</span><span class="nx">dump</span> <span class="o">%&gt;</span><span class="p">.</span><span class="nx">evalJSON</span><span class="p">();</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Please note, the quotation marks around &lt;%= &#8230; %> have been removed.</p>
-
-<p>Second, let the SCRIPT tag only hold the JSON data, then retrieve the data in Javascript with innerHTML:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;script </span><span class="na">id=</span><span class="s">&quot;json_data&quot;</span> <span class="na">type=</span><span class="s">&quot;application/json&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="o">&lt;%=</span> <span class="nx">ActiveSupport</span><span class="o">::</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="err">@</span><span class="nx">data</span><span class="p">)</span> <span class="o">%&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">listData</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;json_data&#39;</span><span class="p">).</span><span class="nx">innerHTML</span><span class="p">.</span><span class="nx">evalJSON</span><span class="p">();</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Those are some small fixes, but they solved big troubles.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
+      </section>
     
   </div>
-</div>
-<aside class="sidebar">
+
   
-    <section>
+  <div class="span4 sidebar">
+    <div class="well">
+      
+        <section>
   <h2>Recent Posts</h2>
   <ul id="recent_posts">
     
@@ -545,8 +318,12 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
 
 
 
-  
-</aside>
+      
+    </div>
+  </div>
+
+</div>
+
 
       </div>
     </div>
@@ -564,7 +341,10 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
       var disqus_shortname = 'yanhao';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://YanhaoYang.github.com/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/';
+        var disqus_url = 'http://YanhaoYang.github.com/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

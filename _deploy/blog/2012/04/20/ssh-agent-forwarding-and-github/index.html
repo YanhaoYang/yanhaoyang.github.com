@@ -8,10 +8,6 @@
   <title>SSH agent forwarding and Github - Yanhao's Blog</title>
   <meta name="author" content="Yanhao Yang">
 
-  
-  <meta name="description" content="Github&#8217;s help says, &#8220;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy &hellip;">
-  
-
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
@@ -114,10 +110,8 @@
 <ul>
 <li><p>modifying the config file</p>
 
-<p>  Host *</p>
-
-<pre><code>ForwardAgent yes
-</code></pre></li>
+<p>  Host *
+    ForwardAgent yes</p></li>
 <li><p>using -A option in the command line.</p></li>
 </ul>
 
@@ -178,7 +172,7 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
         
       </p>
     </footer>
-    
+
     
       <section>
         <h1>Comments</h1>
@@ -195,6 +189,10 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
         <section>
   <h2>Recent Posts</h2>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/">Having Multiple Gemfiles and Make them DRY</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/01/29/a-pitfall-of-updating-foreign-key-with-update-attribute/">A pitfall of updating foreign key with `update_attribute`</a>

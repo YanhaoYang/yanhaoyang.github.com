@@ -4,7 +4,7 @@
   <title><![CDATA[Yanhao's Blog]]></title>
   <link href="http://YanhaoYang.github.com/atom.xml" rel="self"/>
   <link href="http://YanhaoYang.github.com/"/>
-  <updated>2013-01-29T21:21:15+08:00</updated>
+  <updated>2013-02-25T15:43:28+08:00</updated>
   <id>http://YanhaoYang.github.com/</id>
   <author>
     <name><![CDATA[Yanhao Yang]]></name>
@@ -12,6 +12,148 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Having Multiple Gemfiles and Make them DRY]]></title>
+    <link href="http://YanhaoYang.github.com/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/"/>
+    <updated>2013-02-25T21:13:00+08:00</updated>
+    <id>http://YanhaoYang.github.com/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry</id>
+    <content type="html"><![CDATA[<h2>Problem and solutions</h2>
+
+<p>Suppose you are developing a great gem for your great application. For convenience, you want to use local path in your Gemfile locally, but you want to let it install the gem from Github on deployment. Due to the limitation of Bundler, you cannot define a same gem from different sources in your Gemfile. One workaround is to switch the definitions in Gemfile by checking an environment varialbe.</p>
+
+<figure class='code'><figcaption><span>Gemfile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;3.2.12&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;MY_GEM_SOURCE&#39;</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;path/to/my_great_gem&quot;</span>
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">&quot;git@github.com:path/to/my_great_gem.git&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This works well during development. But when you want to deloy it to server and run <code>bundle install --deployment ...</code>, bundler complaints that there&#8217;s no Gemfile.lock. What if you just run <code>bundle install</code> locally, create the Gemfile.lock and check it in? You have to regenerate the lock file each time you switch between development and deployment.</p>
+
+<p>Another solution is to create two Gemfiles, one for development, another for deployment.</p>
+
+<figure class='code'><figcaption><span>Gemfile-for-development</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;3.2.12&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;path/to/my_great_gem&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Gemfile-for-deployment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;3.2.12&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">&quot;git@github.com:path/to/my_great_gem.git&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You just tell bundler which Gemfile to use by setting environment variable <code>BUNDLE_GEMFILE</code>, <code>bundle</code> and <code>rails</code> commands will work as usual.</p>
+
+<p>However, when you change something in the Gemfiles, you have to update both files. That&#8217;s not DRY.</p>
+
+<h2>Make them DRY</h2>
+
+<p>We can take some logic out of models by moving the code to concerns. We can also extract some some code from a view and move it to a partial. Can we do the same to a Gemfile? Although Gemfile is just a ruby file, we cannot use <code>require</code> to load a nother file. After checking source code fo bundler, I found the secrect. In following code, bundler loads Gemfile:</p>
+
+<figure class='code'><figcaption><span>lib/bundler/dsl.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">eval_gemfile</span><span class="p">(</span><span class="n">gemfile</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">instance_eval</span><span class="p">(</span><span class="no">Bundler</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">),</span> <span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'><span class="k">rescue</span> <span class="no">SyntaxError</span> <span class="o">=&gt;</span> <span class="n">e</span>
+</span><span class='line'>  <span class="n">bt</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">[</span><span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">raise</span> <span class="no">GemfileError</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;Gemfile syntax error:&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">bt</span><span class="o">].</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Similarly, we can load other file this way in Gemfiles. For example:</p>
+
+<figure class='code'><figcaption><span>Gemfile-base</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;3.2.12&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Gemfile-for-development</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gemfile</span> <span class="o">=</span> <span class="s1">&#39;Gemfile-base&#39;</span>
+</span><span class='line'><span class="nb">instance_eval</span><span class="p">(</span><span class="no">Bundler</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">),</span> <span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;path/to/my_great_gem&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Gemfile-for-deployment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gemfile</span> <span class="o">=</span> <span class="s1">&#39;Gemfile-base&#39;</span>
+</span><span class='line'><span class="nb">instance_eval</span><span class="p">(</span><span class="no">Bundler</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">),</span> <span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">&quot;git@github.com:path/to/my_great_gem.git&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we have made them DRY.</p>
+
+<h2>Work with multiple Gemfiles</h2>
+
+<p>The simplest way is to set the environment variable manually, for example:</p>
+
+<pre><code>export BUNDLE_GEMFILE=Gemfile-for-development
+</code></pre>
+
+<p>If you use rbenv and the plugin rbenv-vars, I created another simple rbenv plugin <a href="https://github.com/YanhaoYang/rbenv-set-vars">rbenv-set-vars</a> to manage multiple environment variable sets.</p>
+
+<p>To deploy the application with Capistrano, you need to set which Gemfile to use with following setting:</p>
+
+<pre><code>set :bundle_gemfile,  "Gemfile-for-deployment"
+</code></pre>
+
+<p>You also need to pass <code>BUNDLE_GEMFILE</code> to rails server so that it can load dependencies correctly.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A pitfall of updating foreign key with `update_attribute`]]></title>
@@ -44,7 +186,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>you may want to update the foreign key directly with <code>update_attribute</code> sometimes:</p>
+<p>You may want to update the foreign key directly with <code>update_attribute</code> sometimes:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">1</span>
@@ -97,7 +239,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>These are two workarounds I think of.</p>
+<p>hese are two workarounds I think of.</p>
 ]]></content>
   </entry>
   
@@ -119,10 +261,8 @@
 <ul>
 <li><p>modifying the config file</p>
 
-<p>  Host *</p>
-
-<pre><code>ForwardAgent yes
-</code></pre></li>
+<p>  Host *
+    ForwardAgent yes</p></li>
 <li><p>using -A option in the command line.</p></li>
 </ul>
 
