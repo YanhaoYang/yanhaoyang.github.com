@@ -4,7 +4,7 @@
   <title><![CDATA[Yanhao's Blog]]></title>
   <link href="http://YanhaoYang.github.com/atom.xml" rel="self"/>
   <link href="http://YanhaoYang.github.com/"/>
-  <updated>2013-02-23T23:34:25+08:00</updated>
+  <updated>2013-11-21T11:35:24+08:00</updated>
   <id>http://YanhaoYang.github.com/</id>
   <author>
     <name><![CDATA[Yanhao Yang]]></name>
@@ -12,6 +12,227 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Debug a deadlock caused by the ruby JSON parser Oj]]></title>
+    <link href="http://YanhaoYang.github.com/blog/2013/11/21/debug-a-deadlock-caused-by-the-ruby-json-parser-oj/"/>
+    <updated>2013-11-21T08:01:00+08:00</updated>
+    <id>http://YanhaoYang.github.com/blog/2013/11/21/debug-a-deadlock-caused-by-the-ruby-json-parser-oj</id>
+    <content type="html"><![CDATA[<p>Recently some busy processes hang sometimes on a production server,
+where an application based Rails 3.2.13 is running on Ruby 1.9.3-p448.</p>
+
+<p>The problem happened randomly, making it very difficult to debug. Basically,
+the processes sent tens of requests to another server to get some JSON documents,
+then parsed the JSON documents with Oj and initialize many nested objects with
+that data. The processes usually hang after sending a few tens of requests.</p>
+
+<p>After some research, I found some tools to help me locate the problem.</p>
+
+<h2>strace</h2>
+
+<p>Suppose the process 1234 has hang, following command will show where the process
+hang:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>strace -p 1234</span></code></pre></td></tr></table></div></figure>
+
+
+<p>However, it seems not quit useful because the information is very simple.</p>
+
+<p>If I run the command before the process hung, I can roughly see which part
+of the Ruby code is running.</p>
+
+<h2>crash-watch</h2>
+
+<p><code>crash-watch</code> is a <a href="https://github.com/FooBarWidget/crash-watch">gem</a> which
+&ldquo;monitor processes and display useful information when they crash&rdquo;.</p>
+
+<p>This is much more useful than strace in this case. It prints out the whole
+c call stacks. Now I see that the process stopped after a call to <code>pthread_mutex_lock</code>,
+which is called from <code>mark</code> function in val_stack.c file, line 39.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#0  0x00007fbb8058d89c in __lll_lock_wait () from /lib/x86_64-linux-gnu/libpthread.so.0
+</span><span class='line'>#1  0x00007fbb80589080 in _L_lock_903 () from /lib/x86_64-linux-gnu/libpthread.so.0
+</span><span class='line'>#2  0x00007fbb80588f19 in pthread_mutex_lock () from /lib/x86_64-linux-gnu/libpthread.so.0
+</span><span class='line'>#3  0x00007fbb756b3d66 in mark (ptr=&lt;optimized out&gt;) at val_stack.c:39
+</span><span class='line'>#4  0x000000000041fcf9 in gc_mark_children (ptr=135392480, objspace=0x25da8a0) at gc.c:1969
+</span><span class='line'>#5  gc_mark_stacked_objects (objspace=0x25da8a0) at gc.c:1506
+</span><span class='line'>#6  gc_marks (objspace=0x25da8a0) at gc.c:2578
+</span><span class='line'>#7  0x00000000004207ea in garbage_collect (objspace=0x25da8a0) at gc.c:2602
+</span><span class='line'>#8  0x0000000000420e68 in garbage_collect_with_gvl (objspace=0x25da8a0) at gc.c:731
+</span><span class='line'>#9  vm_malloc_prepare (size=129, objspace=0x25da8a0) at gc.c:761
+</span><span class='line'>#10 vm_xmalloc (objspace=0x25da8a0, size=&lt;optimized out&gt;) at gc.c:795
+</span><span class='line'>#11 0x00000000004c9ec3 in rb_str_buf_new (capa=128) at string.c:745
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When I found the source code in Oj gem, it has been clear that the problem is a
+deadlock cause by the gem.</p>
+
+<h2>nrdebug</h2>
+
+<p>After that, I found a more powerful tool built by New Relic: <code>nrdebug</code> in <code>bin</code> directory of
+the newrelic_rpm gem. It collects everything about the process thoroughly, including environment
+variables, c backtraces, ruby backtraces, and open files.</p>
+
+<p>I should have known it earlier.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Having Multiple Gemfiles and Make them DRY]]></title>
+    <link href="http://YanhaoYang.github.com/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/"/>
+    <updated>2013-02-25T21:13:00+08:00</updated>
+    <id>http://YanhaoYang.github.com/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry</id>
+    <content type="html"><![CDATA[<h2>Problem and solutions</h2>
+
+<p>Suppose you are developing a great gem for your great application. For convenience, you want to use local path in your Gemfile locally, but you want to let it install the gem from Github on deployment. Due to the limitation of Bundler, you cannot define a same gem from different sources in your Gemfile. One workaround is to switch the definitions in Gemfile by checking an environment varialbe.</p>
+
+<figure class='code'><figcaption><span>Gemfile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;3.2.12&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;MY_GEM_SOURCE&#39;</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;path/to/my_great_gem&quot;</span>
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">&quot;git@github.com:path/to/my_great_gem.git&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This works well during development. But when you want to deloy it to server and run <code>bundle install --deployment ...</code>, bundler complaints that there&rsquo;s no Gemfile.lock. What if you just run <code>bundle install</code> locally, create the Gemfile.lock and check it in? You have to regenerate the lock file each time you switch between development and deployment.</p>
+
+<p>Another solution is to create two Gemfiles, one for development, another for deployment.</p>
+
+<figure class='code'><figcaption><span>Gemfile-for-development</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;3.2.12&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;path/to/my_great_gem&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Gemfile-for-deployment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;3.2.12&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">&quot;git@github.com:path/to/my_great_gem.git&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You just tell bundler which Gemfile to use by setting environment variable <code>BUNDLE_GEMFILE</code>, <code>bundle</code> and <code>rails</code> commands will work as usual.</p>
+
+<p>However, when you change something in the Gemfiles, you have to update both files. That&rsquo;s not DRY.</p>
+
+<h2>Make them DRY</h2>
+
+<p>We can take some logic out of models by moving the code to concerns. We can also extract some some code from a view and move it to a partial. Can we do the same to a Gemfile? Although Gemfile is just a ruby file, we cannot use <code>require</code> to load a nother file. After checking source code fo bundler, I found the secrect. In following code, bundler loads Gemfile:</p>
+
+<figure class='code'><figcaption><span>lib/bundler/dsl.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">eval_gemfile</span><span class="p">(</span><span class="n">gemfile</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">instance_eval</span><span class="p">(</span><span class="no">Bundler</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">),</span> <span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'><span class="k">rescue</span> <span class="no">SyntaxError</span> <span class="o">=&gt;</span> <span class="n">e</span>
+</span><span class='line'>  <span class="n">bt</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">[</span><span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">raise</span> <span class="no">GemfileError</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;Gemfile syntax error:&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">bt</span><span class="o">].</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Similarly, we can load other file this way in Gemfiles. For example:</p>
+
+<figure class='code'><figcaption><span>Gemfile-base</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;3.2.12&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Gemfile-for-development</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gemfile</span> <span class="o">=</span> <span class="s1">&#39;Gemfile-base&#39;</span>
+</span><span class='line'><span class="nb">instance_eval</span><span class="p">(</span><span class="no">Bundler</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">),</span> <span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;path/to/my_great_gem&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Gemfile-for-deployment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gemfile</span> <span class="o">=</span> <span class="s1">&#39;Gemfile-base&#39;</span>
+</span><span class='line'><span class="nb">instance_eval</span><span class="p">(</span><span class="no">Bundler</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">),</span> <span class="n">gemfile</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;my_great_gem&quot;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">&quot;git@github.com:path/to/my_great_gem.git&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we have made them DRY.</p>
+
+<h2>Work with multiple Gemfiles</h2>
+
+<p>The simplest way is to set the environment variable manually, for example:</p>
+
+<pre><code>export BUNDLE_GEMFILE=Gemfile-for-development
+</code></pre>
+
+<p>If you use rbenv and the plugin rbenv-vars, I created another simple rbenv plugin <a href="https://github.com/YanhaoYang/rbenv-set-vars">rbenv-set-vars</a> to manage multiple environment variable sets.</p>
+
+<p>To deploy the application with Capistrano, you need to set which Gemfile to use with following setting:</p>
+
+<pre><code>set :bundle_gemfile,  "Gemfile-for-deployment"
+</code></pre>
+
+<p>You also need to pass <code>BUNDLE_GEMFILE</code> to rails server so that it can load dependencies correctly.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A pitfall of updating foreign key with `update_attribute`]]></title>
@@ -27,11 +248,11 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">class</span> <span class="nc">Foo</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">class</span> <span class="nc">Foo</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class='line'>    <span class="n">belongs_to</span> <span class="ss">:bar</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Bar</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Bar</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class='line'>    <span class="n">has_one</span> <span class="ss">:foo</span>
 </span><span class='line'>  <span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -44,14 +265,14 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>you may want to update the foreign key directly with <code>update_attribute</code> sometimes:</p>
+<p>You may want to update the foreign key directly with <code>update_attribute</code> sometimes:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">1</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>However, this doesn&#8217;t always work.</p>
+<p>However, this doesn&rsquo;t always work.</p>
 
 <p>For example, in following code <code>update_attribute</code> does nothing:</p>
 
@@ -62,7 +283,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&#8217;s wrong with it?</p>
+<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&rsquo;s wrong with it?</p>
 
 <p>This is a result of the autosave mechanism of ActiveRecord. When <code>Foo#bar=</code> is called, a callback for saving associations will be created, which will set <code>foo.bar_id</code> to <code>bar.id</code>.</p>
 
@@ -97,9 +318,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>These are two workarounds I think of.</p>
-
-<p><strong>UPDATE</strong>: <code>update_attribute</code> is being deprecated in favor of <code>update_column</code>, and will be removed in Rails 4.</p>
+<p>hese are two workarounds I think of.</p>
 ]]></content>
   </entry>
   
@@ -108,30 +327,28 @@
     <link href="http://YanhaoYang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github/"/>
     <updated>2012-04-20T08:02:00+08:00</updated>
     <id>http://YanhaoYang.github.com/blog/2012/04/20/ssh-agent-forwarding-and-github</id>
-    <content type="html"><![CDATA[<p><a href="http://help.github.com/deploy-keys/">Github&#8217;s help</a> says,</p>
+    <content type="html"><![CDATA[<p><a href="http://help.github.com/deploy-keys/">Github&rsquo;s help</a> says,</p>
 
-<blockquote><p>&#8220;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy keys. Instead, you should use ssh-agent forwarding to temporarily allow the server to use your local ssh keys. Not only is this method easier to maintain, since you don’t have any extra keys, but it’s also more secure as the server never has keys saved to disk in case of a compromise.&#8221;</p></blockquote>
+<blockquote><p>&ldquo;If your deploy process involves sshing into the server you are deploying to, you probably do not need to use deploy keys. Instead, you should use ssh-agent forwarding to temporarily allow the server to use your local ssh keys. Not only is this method easier to maintain, since you don’t have any extra keys, but it’s also more secure as the server never has keys saved to disk in case of a compromise.&rdquo;</p></blockquote>
 
 <p>But how to use ssh-agent fowarding?</p>
 
-<p>It&#8217;s pretty simple actually, but I made it work after some research.</p>
+<p>It&rsquo;s pretty simple actually, but I made it work after some research.</p>
 
 <p>First, ssh-agent forwarding can be enabled by,</p>
 
 <ul>
 <li><p>modifying the config file</p>
 
-<p>  Host *</p>
-
-<pre><code>ForwardAgent yes
-</code></pre></li>
+<p>  Host *
+    ForwardAgent yes</p></li>
 <li><p>using -A option in the command line.</p></li>
 </ul>
 
 
 <p>After enabling ssh-agent forwarding, I can connect another server from a connected server without sending a password. The private key on my MacBook is used for authentication.</p>
 
-<p>But when I tried to run &#8220;sudo git pull&#8221;, the command failed. In order to use ssh-agent forwarding after running sudo, I need to keep the environment variable <code>SSH_AUTH_SOCK</code>. This could be done by editing /etc/sudoers file,</p>
+<p>But when I tried to run &ldquo;sudo git pull&rdquo;, the command failed. In order to use ssh-agent forwarding after running sudo, I need to keep the environment variable <code>SSH_AUTH_SOCK</code>. This could be done by editing /etc/sudoers file,</p>
 
 <pre><code>Defaults    env_reset
 Defaults    env_keep = "SSH_AUTH_SOCK"
@@ -181,7 +398,7 @@ Defaults    env_keep = "SSH_AUTH_SOCK"
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Please note, the quotation marks around &lt;%= &#8230; %> have been removed.</p>
+<p>Please note, the quotation marks around &lt;%= &hellip; %> have been removed.</p>
 
 <p>Second, let the SCRIPT tag only hold the JSON data, then retrieve the data in Javascript with innerHTML:</p>
 

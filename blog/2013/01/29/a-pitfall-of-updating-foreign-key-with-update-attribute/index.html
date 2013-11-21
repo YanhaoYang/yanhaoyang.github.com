@@ -8,16 +8,6 @@
   <title>A pitfall of updating foreign key with `update_attribute` - Yanhao's Blog</title>
   <meta name="author" content="Yanhao Yang">
 
-  
-  <meta name="description" content="Suppose there are following models and associations: 1
-2
-3
-4
-5
-6
-7 class Foo &lt; ActiveRecord::Base belongs_to :bar end class Bar &lt; ActiveRecord &hellip;">
-  
-
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
@@ -116,11 +106,11 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">class</span> <span class="nc">Foo</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">class</span> <span class="nc">Foo</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class='line'>    <span class="n">belongs_to</span> <span class="ss">:bar</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Bar</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Bar</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class='line'>    <span class="n">has_one</span> <span class="ss">:foo</span>
 </span><span class='line'>  <span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -133,14 +123,14 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>you may want to update the foreign key directly with <code>update_attribute</code> sometimes:</p>
+<p>You may want to update the foreign key directly with <code>update_attribute</code> sometimes:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">foo</span><span class="o">.</span><span class="n">update_attribute</span> <span class="ss">:bar_id</span><span class="p">,</span> <span class="mi">1</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>However, this doesn&#8217;t always work.</p>
+<p>However, this doesn&rsquo;t always work.</p>
 
 <p>For example, in following code <code>update_attribute</code> does nothing:</p>
 
@@ -151,7 +141,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&#8217;s wrong with it?</p>
+<p>After <code>update_attribute</code> has been called, <code>foo#bar_id</code> remains 1. What&rsquo;s wrong with it?</p>
 
 <p>This is a result of the autosave mechanism of ActiveRecord. When <code>Foo#bar=</code> is called, a callback for saving associations will be created, which will set <code>foo.bar_id</code> to <code>bar.id</code>.</p>
 
@@ -186,9 +176,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>These are two workarounds I think of.</p>
-
-<p><strong>UPDATE</strong>: <code>update_attribute</code> is being deprecated in favor of <code>update_column</code>, and will be removed in Rails 4.</p>
+<p>hese are two workarounds I think of.</p>
 </div>
 
   
@@ -232,9 +220,11 @@
           <a class="basic-alignment left" href="/blog/2012/04/20/ssh-agent-forwarding-and-github/" title="Previous Post: SSH agent forwarding and Github">&laquo; SSH agent forwarding and Github</a>
         
         
+          <a class="basic-alignment right" href="/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/" title="Next Post: Having Multiple Gemfiles and Make them DRY">Having Multiple Gemfiles and Make them DRY &raquo;</a>
+        
       </p>
     </footer>
-    
+
     
       <section>
         <h1>Comments</h1>
@@ -253,6 +243,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/21/debug-a-deadlock-caused-by-the-ruby-json-parser-oj/">Debug a deadlock caused by the ruby JSON parser Oj</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/25/having-multiple-gemfiles-and-make-them-dry/">Having Multiple Gemfiles and Make them DRY</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/01/29/a-pitfall-of-updating-foreign-key-with-update-attribute/">A pitfall of updating foreign key with `update_attribute`</a>
       </li>
     
@@ -266,7 +264,6 @@
     
   </ul>
 </section>
-
 
 
 
